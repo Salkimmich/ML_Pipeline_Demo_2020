@@ -7,9 +7,9 @@ Technical PoC: Sara Kimmich
 ### Contents:
 
 1. Introduction
-2. Data Science Scope
-    2a. Business Case
-    2b. Key User Stories
+2. Data Science Scope //
+    2a. Business Case // 
+    2b. Key User Stories // 
 3. Data
 4. Feature Engineering
 5. Machine Learning Model
