@@ -1,0 +1,664 @@
+{% extends "base.html" %}
+
+{% block title %}
+	Dashboard
+{% endblock %}
+
+{% block content %}
+<style type="text/css">
+  
+[slider] {
+  width: 300px;
+  position: relative;
+  height: 5px;
+  margin: 45px 0 10px 0;
+}
+
+[slider] > div {
+  position: absolute;
+  left: 13px;
+  right: 15px;
+  height: 5px;
+}
+[slider] > div > [inverse-left] {
+  position: absolute;
+  left: 0;
+  height: 5px;
+  border-radius: 10px;
+  background-color: #CCC;
+  margin: 0 7px;
+}
+
+[slider] > div > [inverse-right] {
+  position: absolute;
+  right: 0;
+  height: 5px;
+  border-radius: 10px;
+  background-color: #CCC;
+  margin: 0 7px;
+}
+
+
+[slider] > div > [range] {
+  position: absolute;
+  left: 0;
+  height: 5px;
+  border-radius: 14px;
+  background-color: #d02128;
+}
+
+[slider] > div > [thumb] {
+  position: absolute;
+  top: -7px;
+  z-index: 2;
+  height: 20px;
+  width: 20px;
+  text-align: left;
+  margin-left: -11px;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  background-color: #FFF;
+  border-radius: 50%;
+  outline: none;
+}
+
+[slider] > input[type=range] {
+  position: absolute;
+  pointer-events: none;
+  -webkit-appearance: none;
+  z-index: 3;
+  height: 14px;
+  top: -2px;
+  width: 100%;
+  opacity: 0;
+}
+
+div[slider] > input[type=range]:focus::-webkit-slider-runnable-track {
+  background: transparent;
+  border: transparent;
+}
+
+div[slider] > input[type=range]:focus {
+  outline: none;
+}
+
+div[slider] > input[type=range]::-webkit-slider-thumb {
+  pointer-events: all;
+  width: 28px;
+  height: 28px;
+  border-radius: 0px;
+  border: 0 none;
+  background: red;
+  -webkit-appearance: none;
+}
+
+div[slider] > input[type=range]::-ms-fill-lower {
+  background: transparent;
+  border: 0 none;
+}
+
+div[slider] > input[type=range]::-ms-fill-upper {
+  background: transparent;
+  border: 0 none;
+}
+
+div[slider] > input[type=range]::-ms-tooltip {
+  display: none;
+}
+
+[slider] > div > [sign] {
+  opacity: 0;
+  position: absolute;
+  margin-left: -11px;
+  top: -39px;
+  z-index:3;
+  background-color: #d02128;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 28px;
+  -webkit-border-radius: 28px;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  text-align: center;
+}
+
+[slider] > div > [sign]:after {
+  position: absolute;
+  content: '';
+  left: 0;
+  border-radius: 16px;
+  top: 19px;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top-width: 16px;
+  border-top-style: solid;
+  border-top-color: #d02128;
+}
+
+[slider] > div > [sign] > span {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+[slider]:hover > div > [sign] {
+  opacity: 1;
+}
+
+</style>
+
+
+
+
+	{% if messages %}
+
+	    {% for message in messages %}
+
+		<!--Panel-->
+		<div class="card border-success mb-3">
+		    <div class="card-header text-danger">
+		        <p class="card-title">{{ message }}</p>
+		    </div>
+		</div>
+		<!--/.Panel-->
+	    
+	    {% endfor %}
+
+	{% endif %}
+
+	<h1 class="mt-5 text-center">Welcome {{ request.user }}</h1>
+<!-- 	<p class="text-left mt-5">Bio: {{ user.profile.bio }}</p>
+	<p class="text-left">Joined: {{ user.profile.timestamp }}</p> -->
+  <h5>Click ‘Browse’ to select your Excel or CSV file</h5>
+    <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+        <div class="input-group">
+
+      <div class="custom-file">
+        
+        <input type="file" name="employeefile" class="custom-file-input" id="inputGroupFile04">
+        <label class="custom-file-label" for="inputGroupFile04">Choose file</label>
+      </div>
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="submit">Click to upload selected file</button>
+{% csrf_token %}
+<input
+    type="button"
+    class="btn btn-outline-secondary"
+    value="Download Latest Results"
+    onclick="location.href={% url 'users:download' %}">
+
+
+
+    </div>
+
+
+  
+
+<!-- range parameter -->
+        <div class="container">
+          <h3>Apply Filters</h3><br><br>
+              <div class="row">
+                <div class="col-sm">
+                  <label for="customRange1" class="form-label font-weight-bold">Starting row</label>
+                <input type="range" name="startval" class="form-range" value="0" min="0" max="60000" id="customRange1" onInput="$('#rangeval1').html($(this).val())">
+                <span id="rangeval1" name="startval"><!-- Default value --></span>
+<!--                    <span id="rangeval">50&lt;!&ndash; Default value &ndash;&gt;</span>-->
+                </div>
+                <div class="col-sm">
+                  <label for="customRange2" class="form-label font-weight-bold">Ending row</label>
+                <input type="range" name="endval" class="form-range" min="0" max="60000" id="customRange2" onInput="$('#rangeval2').html($(this).val())">
+                <span id="rangeval2" name="endval"><!-- Default value --></span>
+                </div>
+
+                <div class="col-sm">
+                  <label for="customRange3" class="form-label font-weight-bold">Region/Community(1-5)</label>
+                <input type="range" name="rcval" class="form-range" min="1" max="5" id="customRange3" onInput="$('#rangeval3').html($(this).val())">
+                <span id="rangeval3" name="rcval"><!-- Default value --></span>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="rcbool" id="flexRadioDefault1" >
+                  <label class="form-check-label" for="flexRadioDefault1">
+                    on/of
+                  </label>
+                </div>
+
+                
+              </div>
+            </div>
+
+<div class="container">
+
+  <div class="row">
+      <div class="col-sm">
+
+      <div class="input-group">
+        <div class="input-group-prepend">
+
+          <select name="IssueAreal1" class="form-select" aria-label="Default select example">
+          <option name="IssueAreal1" value="Not" selected>Select Issue SL1</option>
+          <option name="IssueAreal1" value="Health">Health</option>
+          <option name="IssueAreal1" value="Human Servicesl1">Human Services</option>
+          <option name="IssueAreal1" value="Education">Education</option>
+          <option name="IssueAreal1" value="Community and Economic Development">Community and Economic Development</option>
+          <option name="IssueAreal1" value="Arts and Culture">Arts and Culture</option>
+          <option name="IssueAreal1" value="Public Safety">Public Safety</option>
+          <option name="IssueAreal1" value="Public Affairs">Public Affairs</option>
+          <option name="IssueAreal1" value="Information and Communications">Information and Communications</option>
+          <option name="IssueAreal1" value="Environment">Environment</option>
+
+        </select>
+        </div>
+      </div>
+      <br>
+      <div class="input-group">
+        <div class="input-group-prepend">
+
+          <select name="IssueAreal2" class="form-select" aria-label="Default select example">
+          <option name="IssueAreal2" value="Not" selected>Select Issue SL2</option>
+          <option name="IssueAreal2" value="Outpatient Medical Care">Outpatient Medical Care</option>
+          <option name="IssueAreal2" value="Education Services">Education Services</option>
+          <option name="IssueAreal2" value="Basic and Emergency Aid">Basic and Emergency Aid</option>
+          <option name="IssueAreal2" value="Reproductive Health Care">Reproductive Health Care</option>
+          <option name="IssueAreal2" value="Family Services">Family Services</option>
+          <option name="IssueAreal2" value="Shelter and Residential Care">Shelter and Residential Care</option>
+          <option name="IssueAreal2" value="Economic Development">Economic Development</option>
+          <option name="IssueAreal2" value="Performing Arts">Performing Arts</option>
+          <option name="IssueAreal2" value="Mental Health Care">Mental Health Care</option>
+          <option name="IssueAreal2" value="Personal Services">Personal Services</option>
+          <option name="IssueAreal2" value="Museums">Museums</option>
+          <option name="IssueAreal2" value="Elementary and Secondary Education">Elementary and Secondary Education</option>
+          <option name="IssueAreal2" value="Housing Development">Housing Development</option>
+          <option name="IssueAreal2" value="Financial Services">Financial Services</option>
+          <option name="IssueAreal2" value="Special Population Support">Special Population Support</option>
+          <option name="IssueAreal2" value="Legal Services">Legal Services</option>
+          <option name="IssueAreal2" value="Community Improvement">Community Improvement</option>
+          <option name="IssueAreal2" value="Leadership Development">Leadership Development</option>
+          <option name="IssueAreal2" value="Public Health">Public Health</option>
+          <option name="IssueAreal2" value="Youth Development">Youth Development</option>
+          <option name="IssueAreal2" value="Business and Industry">Business and Industry</option>
+          <option name="IssueAreal2" value="Arts Services">Arts Services</option>
+          <option name="IssueAreal2" value="Higher Education">Higher Education</option>
+          <option name="IssueAreal2" value="Corrections and Penology">Corrections and Penology</option>
+          <option name="IssueAreal2" value="Communication Media">Communication Media</option>
+          <option name="IssueAreal2" value="Environmental Justice">Environmental Justice</option>
+          <option name="IssueAreal2" value="Health Care Access">Health Care Access</option>
+          <option name="IssueAreal2" value="Job Services">Job Services</option>
+          <option name="IssueAreal2" value="Abuse Prevention">Abuse Prevention</option>
+          <option name="IssueAreal2" value="Adult Education">Adult Education</option>
+          <option name="IssueAreal2" value="Student Services">Student Services</option>
+          <option name="IssueAreal2" value="Graduate and Professional">Graduate and Professional</option>
+          <option name="IssueAreal2" value="Sustainable Development">Sustainable Development</option>
+        </select>
+        </div>
+      </div>
+      <br>
+      <div class="input-group">
+        <div class="input-group-prepend">
+
+          <select name="IssueAreal3" class="form-select" aria-label="Default select example">
+          <option name="IssueAreal3" value="Not" selected>Select Area SL3</option>
+          <option name="IssueAreal3" value="Food Aid">Food Aid</option>
+          <option name="IssueAreal3" value="Out-of-School Learning">Out-of-School Learning</option>
+          <option name="IssueAreal3" value="Maternal and Perinatal Health">Maternal and Perinatal Health</option>
+          <option name="IssueAreal3" value="College Preparation">College Preparation</option>
+          <option name="IssueAreal3" value="Health Care Clinics">Health Care Clinics</option>
+          <option name="IssueAreal3" value="Employment">Employment</option>
+          <option name="IssueAreal3" value="Mental Health Counseling">Mental Health Counseling</option>
+          <option name="IssueAreal3" value="Homeless Shelters">Homeless Shelters</option>
+          <option name="IssueAreal3" value="Home Financing">Home Financing</option>
+          <option name="IssueAreal3" value="Charter School Education">Charter School Education</option>
+          <option name="IssueAreal3" value="Community Organizing">Community Organizing</option>
+          <option name="IssueAreal3" value="Legal Aid">Legal Aid</option>
+          <option name="IssueAreal3" value="Food Banks">Food Banks</option>
+          <option name="IssueAreal3" value="Child Educational Development">Child Educational Development</option>
+          <option name="IssueAreal3" value="Free Goods Distribution">Free Goods Distribution</option>
+          <option name="IssueAreal3" value="Child Development">Child Development</option>
+          <option name="IssueAreal3" value="Communicable Disease Control">Communicable Disease Control</option>
+          <option name="IssueAreal3" value="Child Welfare">Child Welfare</option>
+          <option name="IssueAreal3" value="Reading Promotion">Reading Promotion</option>
+          <option name="IssueAreal3" value="Domestic Violence Shelters">Domestic Violence Shelters</option>
+          <option name="IssueAreal3" value="Corporate Social Responsibility">Corporate Social Responsibility</option>
+          <option name="IssueAreal3" value="Arts Education">Arts Education</option>
+          <option name="IssueAreal3" value="Child Care">Child Care</option>
+          <option name="IssueAreal3" value="Adult Peer Mentoring">Adult Peer Mentoring</option>
+          <option name="IssueAreal3" value="Youth Services">Youth Services</option>
+          <option name="IssueAreal3" value="Housing for the Homeless">Housing for the Homeless</option>
+          <option name="IssueAreal3" value="Equal Opportunity in Higher Education">Equal Opportunity in Higher Education</option>
+          <option name="IssueAreal3" value="Developmental Disability Services">Developmental Disability Services</option>
+          <option name="IssueAreal3" value="Supportive Housing">Supportive Housing</option>
+          <option name="IssueAreal3" value="Immigrant Services">Immigrant Services</option>
+          <option name="IssueAreal3" value="Financial Counseling">Financial Counseling</option>
+          <option name="IssueAreal3" value="Film and Video">Film and Video</option>
+          <option name="IssueAreal3" value="Job Training">Job Training</option>
+          <option name="IssueAreal3" value="Homeless Shelter Line">Homeless Shelter Line</option>
+          <option name="IssueAreal3" value="Public Housing">Public Housing</option>
+          <option name="IssueAreal3" value="Student Retention">Student Retention</option>
+          <option name="IssueAreal3" value="Prison Alternatives">Prison Alternatives</option>
+          <option name="IssueAreal3" value="Early Childhood Education">Early Childhood Education</option>
+          <option name="IssueAreal3" value="Continuing Education">Continuing Education</option>
+          <option name="IssueAreal3" value="Youth Mentoring">Youth Mentoring</option>
+          <option name="IssueAreal3" value="Business Education">Business Education</option>
+          <option name="IssueAreal3" value="Addiction Services">Addiction Services</option>
+          <option name="IssueAreal3" value="Child Advocacy">Child Advocacy</option>
+          <option name="IssueAreal3" value="Community Mental Health Care">Community Mental Health Care</option>
+          <option name="IssueAreal3" value="Rural Development">Rural Development</option>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+        </select>
+        </div>
+      </div>
+      <br>
+   </div>
+
+<span>Gender:</span>
+    <div class="col-sm">
+
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="genderM" id="flexRadioDefault1" >
+        <label class="form-check-label" for="flexRadioDefault1">
+          Male
+        </label>
+      </div>
+
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" name="genderF" id="flexRadioDefault2" >
+      <label class="form-check-label" for="flexRadioDefault2">
+        Female
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" name="genderO" id="flexRadioDefault3" >
+      <label class="form-check-label" for="flexRadioDefault3">
+        Others
+      </label>
+    </div>
+
+    </div>
+    <span>NPS Type:</span>
+    <div class="col-sm">
+
+      <div class="input-group">
+        <div class="input-group-prepend">
+
+          <select name="NPS_type" class="form-select" aria-label="Default select example">
+          <option name="NPS_type" value="Not" selected>Select Type</option>
+          <option name="NPS_type" value="Promoter">Promoter</option>
+          <option name="NPS_type" value="Passive">Passive</option>
+          <option name="NPS_type" value="Detractor">Detractor</option>
+
+        </select>
+        </div>
+      </div>
+
+    </div>
+
+</div>
+
+<div class="row">
+<div class="col-sm">
+  <span><h4>Age Group Filter</h4></span>
+
+</div>
+<span>Annual Budget Range:</span>
+    <div class="col-sm">
+
+      <div class="input-group">
+        <div class="input-group-prepend">
+
+          <select name="budget_range" class="form-select" aria-label="Default select example">
+          <option name="budget_range" value="Not" selected>Select Range</option>
+          <option name="budget_range" value="<$500K"><$500K</option>
+          <option name="budget_range" value="$500K-$1M">$500K-$1M</option>
+          <option name="budget_range" value="$1M-$5M">$1M-$5M</option>
+          <option name="budget_range" value="$5M-$10M">$5M-$10M</option>
+          <option name="budget_range" value="$10M-$25M">$10M-$25M</option>
+          <option name="budget_range" value=">$25M">>$25M</option>
+          
+          
+          
+
+        </select>
+        </div>
+      </div>
+
+    </div>
+</div>
+
+            </div>
+<div slider id="slider-distance">
+  <div>
+    <div inverse-left style="width:70%;"></div>
+    <div inverse-right style="width:70%;"></div>
+    <div range style="left:0%;right:0%;"></div>
+    <span thumb style="left:0%;"></span>
+    <span thumb style="left:100%;"></span>
+    <div sign style="left:0%;">
+      <span name="startageval" id="value">0</span>
+    </div>
+    <div sign style="left:100%;">
+      <span name="endageval" id="value">100</span>
+    </div>
+  </div>
+  <input name="startageval" type="range" value="0" max="100" min="0" step="1" oninput="
+  this.value=Math.min(this.value,this.parentNode.childNodes[5].value-1);
+  let value = (this.value/parseInt(this.max))*100
+  var children = this.parentNode.childNodes[1].childNodes;
+  children[1].style.width=value+'%';
+  children[5].style.left=value+'%';
+  children[7].style.left=value+'%';children[11].style.left=value+'%';
+  children[11].childNodes[1].innerHTML=this.value;" />
+
+  <input name="endageval" type="range" value="100" max="100" min="0" step="1" oninput="
+  this.value=Math.max(this.value,this.parentNode.childNodes[3].value-(-1));
+  let value = (this.value/parseInt(this.max))*100
+  var children = this.parentNode.childNodes[1].childNodes;
+  children[3].style.width=(100-value)+'%';
+  children[5].style.right=(100-value)+'%';
+  children[9].style.left=value+'%';children[13].style.left=value+'%';
+  children[13].childNodes[1].innerHTML=this.value;" />
+</div>
+
+       
+        </form>
+
+
+
+<div class="container">
+  <br><br>
+  <span><h4>Demographic Breakdown</h4></span>
+               <br>
+               <br>
+  <div class="row">
+    <div class="col-sm">
+      <div class="card" style="width: 18rem;">
+          <div class="card-body">
+
+            <h5 class="card-title">Gender</h5>
+              <ul class="list-group scroll">
+
+              {% for key,value in content.gender.items %}
+                    <li class="list-group-item ">{{ key }} : {{ value }}</li>
+                {% endfor %}
+
+            </ul>
+              <!-- <a href="#" class="card-link">Extra Feature</a> -->
+          </div>
+        </div>
+    </div>
+    <div class="col-sm">
+      <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">NPS Types</h5>
+            
+              <ul class="list-group scroll">
+
+              {% for key,value in content.NPS_type.items %}
+                    <li class="list-group-item ">{{ key }} : {{ value }}</li>
+                {% endfor %}
+
+            </ul>
+          
+          </div>
+        </div>
+    </div>
+    <div class="col-sm">
+      <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Ethnicity</h5>
+           
+              <ul class="list-group scroll">
+
+              {% for key,value in content.race_ethnicity.items %}
+                    <li class="list-group-item">{{ key }} : {{ value }}</li>
+                {% endfor %}
+
+            </ul>
+              
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+<br><br><br>
+<span><h4>Top 30 most representative feedback responses</h4></span>
+<br><br>
+<div class="table-responsive  scroll_tb">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+            <th scope="col">#</th>
+            {% for header in content.header %}
+
+          <th scope="col">{{ header }}</th>
+            {% endfor %}
+        </tr>
+      </thead>
+      <tbody >
+      {% for value in content.row %}
+        <tr>
+          <th scope="row">{{ forloop.counter }}</th>
+            {% for i in value %}
+                <td>{{ i }}</td>
+            {% endfor %}
+        </tr>
+       {% endfor %}
+      </tbody>
+    </table>
+</div>
+
+
+
+<div class="container">
+  <div>
+    <div class="col-sm">
+        <h3 class="font-weight-bold">Sentiment Analysis</h3><br>
+      <canvas id="pie-chart"></canvas>
+    </div>
+    <div class="col-sm">
+        <h3 class="font-weight-bold">Topic Distribution</h3><br>
+      <canvas id="tag-chart2"></canvas>
+    </div>
+    <div class="col-sm ">
+        <h3 class="font-weight-bold">Word Cloud</h3><br>
+      <img src={{ content.wordcloud_img }}>
+    </div>
+  </div>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+  <script>
+
+
+    var config = {
+      type: 'pie',
+      data: {
+        datasets: [{
+          data: {{ content.data_sentiment|safe }},
+          backgroundColor: [
+            '#FF3333', '#52FF33', '#F0FF33', '#C0C0C0', '#D3D3D3'
+          ],
+          label: 'Sentiment Analysis'
+        }],
+        labels: {{  content.data_label_sentiment|safe }}
+      },
+      options: {
+        responsive: true
+      }
+    };
+
+     var config2 = {
+      type: 'pie',
+      data: {
+        datasets: [{
+          data: {{ content.tag_values|safe }},
+          backgroundColor: [
+            '#FF3333', '#52FF33', '#F0FF33', '#C0C0C0', '#D3D3D3'
+          ],
+          label: 'Tagging Prediction Analysis'
+        }],
+        labels: {{  content.tag_label|safe }}
+      },
+      options: {
+        responsive: true
+      }
+    };
+
+
+    window.onload = function() {
+      var ctx = document.getElementById('pie-chart').getContext('2d');
+      window.myPie = new Chart(ctx, config);
+      var ctx2 = document.getElementById('tag-chart2').getContext('2d');
+      window.myPie = new Chart(ctx2, config2);
+    };
+
+   
+
+  </script>
+
+
+{% endblock content %}
