@@ -2,8 +2,7 @@
 
 ### Developer Contact
 
-Technical PoC: Sara Kimmich
-
+Technical PoC: 
 ### Contents:
 
 1. Introduction
