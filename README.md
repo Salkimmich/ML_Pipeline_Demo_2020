@@ -64,7 +64,7 @@ Technical PoC:
 5. What measures do you have in place to make sure your data is secured?
 
 
-## 9. Cloud Integration 
+## 10. Cloud Integration 
 
 *Further testing and integration with larger DevOps ecosystem to be defined and discussed in future scope of work with client.*
 
